@@ -1,0 +1,78 @@
+---
+title: "525 Final"
+author: "Xinqian Dai"
+date: '2022-10-29'
+output: pdf_document
+---
+R code for turning year to decade:
+```{r}
+disney<-disney%>% filter(year>=1984)
+# not much data before year 1984
+disney<-disney%>% mutate(round_to_decade = round(year / 10) * 10)
+# This step round year to its nearest decade number.(eg. 1902->1900, 1908->1910)
+disney$round_to_decade<-as.factor(disney2$round_to_decade)
+# turn roundup year to factor instead of numeric data
+```
+R code for summary table:
+```{r}
+disney<-disney%>% mutate(budget_m=budget/1000000)
+mean(disney$total_gross_m)
+sd(disney$total_gross_m)
+mean(disney$budget_m)
+sd(disney$budget_m)
+mean(disney$rating)
+sd(disney$rating)
+mean(disney$length)
+sd(disney$length)
+mean(disney$year)
+sd(disney$year)
+```
+R code for added-variable plots:
+```{r}
+avPlots(fit)
+```
+R code for Scatterplots:
+```{r}
+disney %>% ggplot(aes(x=budget_m, y=total_gross_m)) + geom_point(color="blue") + ggtitle(label = "Budget In
+Millions VS Total Gross In Millions") + labs(x = "Budget", y = "Total Gross")
+disney %>% ggplot(aes(x=rating, y=total_gross_m)) + geom_point(color="red") + ggtitle(label = "Rating VS Total
+Gross In Millions") + labs(x = "Rating", y = "Total Gross")
+disney %>% ggplot(aes(x=length, y=total_gross_m)) + geom_point(color="green") + ggtitle(label = "Length VS
+Total Gross In Millions") + labs(x = "Length", y = "Total Gross")
+disney %>% ggplot(aes(x=year, y=total_gross_m)) + geom_point(color="pink") + ggtitle(label = "Years VS Total
+Gross In Millions") + labs(x = "Year", y = "Total Gross")
+```
+R code for Boxplots:
+```{r}
+boxplot(total_gross_m ~genre, data = disney, xlab="Genre",ylab="Total Gross")
+boxplot(total_gross_m ~mpaa_rating, data = disney, xlab="MPAA Rating",ylab="Total Gross")
+boxplot(total_gross_m ~month, data = disney, xlab="Month",ylab="Total Gross")
+```
+R code for simple linear regressions:
+```{r}
+fit_budget <- lm(total_gross_m~budget_m,data=data)
+fit_rating <- lm(total_gross_m~rating,data=data)
+fit_length <- lm(total_gross_m~length,data=data)
+fit_year <- lm(total_gross_m~year,data=data)
+summary(fit_budget)
+summary(fit_rating)
+summary(fit_length)
+summary(fit_year)
+```
+R code for multiple interactive and additive regression:
+```{r}
+disney1<-disney%>% select(total_gross_m,budget_m,rating,length,year)
+fit<-lm(total_gross_m~.,data=disney1)
+summary(fit)
+fit_interact<-lm(total_gross_m~.^2,data = disney1)
+summary(fit_interact)
+anova(fit,fit_interact)
+disney1<-disney2%>% select(total_gross_m,budget_m,rating,length,round_to_decade,mpaa_rating)
+new.fit<-lm(total_gross_m~.,data = disney1)
+summary(new.fit)
+new.interaction.fit<-lm(total_gross_m~.^2,data=disney1)
+anova(new.fit,new.interaction.fit)
+summary(new.interaction.fit)
+disney.n<-disney1[-6]
+no.decade.interaction<-lm(total_gross_m~.^2,disney.n)
+anova(new.interaction.fit,no.decade.interaction)
